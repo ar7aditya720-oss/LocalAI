@@ -1,0 +1,413 @@
+LocalAI
+
+Sovereign AI Workbench
+
+Technology Stack Document
+
+Version 1.0  •  September 2026
+
+1. Overview
+
+LocalAI is a local-first, privacy-preserving AI workbench designed for sovereign operation. The stack prioritizes offline capability, low latency, and full data ownership while remaining modular and extensible.
+
+Core design principles:
+
+Local-first inference — models run on-device or on private infrastructure
+
+Minimal external dependencies — no mandatory cloud services
+
+Clean separation of frontend, API, agents, and model runtime
+
+Simple integration path using the existing HTML UI via POST /api/chat
+
+2. High-Level Architecture
+
+The system is organized into four primary layers:
+
+Layer
+
+Responsibility
+
+Frontend
+
+Chat UI, conversation history, settings, streaming response display
+
+API Gateway
+
+FastAPI — REST endpoints, auth, request validation, streaming
+
+Agent Runtime
+
+Orchestration, tool calling, multi-step reasoning, model routing
+
+Model Layer
+
+Local LLM inference (Ollama / llama.cpp), embeddings, vector store
+
+3. Frontend Stack
+
+The existing HTML/CSS/JS UI is retained as the primary frontend. It already contains the intended backend integration point (POST /api/chat) and requires no structural redesign.
+
+3.1 Core Technologies
+
+Component
+
+Choice
+
+Notes
+
+Markup / Structure
+
+HTML5
+
+Existing single-page application structure
+
+Styling
+
+CSS3 / Tailwind (optional)
+
+Current custom CSS; Tailwind can be introduced later if desired
+
+Logic
+
+Vanilla JavaScript
+
+Fetch API + EventSource / ReadableStream for SSE streaming
+
+State
+
+In-memory + localStorage
+
+Conversation history and user preferences stored client-side
+
+Build / Serve
+
+Static files
+
+Served by FastAPI StaticFiles or any static web server
+
+3.2 Key Frontend Responsibilities
+
+Render chat interface and message history
+
+Send user messages via POST /api/chat
+
+Handle streaming (Server-Sent Events or chunked responses)
+
+Display model / agent status and settings
+
+Persist conversation locally for offline continuity
+
+4. Backend Stack
+
+Python + FastAPI forms the core API layer. It is lightweight, async-native, and excellent for streaming LLM responses.
+
+4.1 Core Framework & Runtime
+
+Component
+
+Choice
+
+Rationale
+
+Language
+
+Python 3.11+
+
+Best ecosystem for AI/ML tooling
+
+Web Framework
+
+FastAPI
+
+Async, automatic OpenAPI, excellent streaming support
+
+ASGI Server
+
+Uvicorn
+
+High-performance ASGI server
+
+Validation
+
+Pydantic v2
+
+Type-safe request/response models
+
+HTTP Client
+
+httpx
+
+Async client for calling Ollama / model servers
+
+4.2 Primary API Endpoints
+
+Endpoint
+
+Method
+
+Purpose
+
+/api/chat
+
+POST
+
+Main chat completion (supports streaming)
+
+/api/models
+
+GET
+
+List available local models
+
+/api/agents
+
+GET / POST
+
+List / configure agents
+
+/api/health
+
+GET
+
+Health check & model status
+
+/api/embeddings
+
+POST
+
+Generate embeddings for RAG
+
+5. AI & Model Layer
+
+All inference is intended to run locally. The architecture supports a model router that can select among multiple backends.
+
+5.1 Inference Runtime
+
+Component
+
+Choice
+
+Notes
+
+Primary Runtime
+
+Ollama
+
+Simple local model management & OpenAI-compatible API
+
+Alternative
+
+llama.cpp / llama-cpp-python
+
+Maximum control and quantisation flexibility
+
+High-throughput (optional)
+
+vLLM / TGI
+
+For multi-user or larger GPU setups
+
+Embeddings
+
+nomic-embed / bge / all-MiniLM
+
+Local embedding models via Ollama or sentence-transformers
+
+5.2 Agent & Orchestration
+
+Component
+
+Choice
+
+Notes
+
+Agent Framework
+
+Custom + LangGraph (optional)
+
+Lightweight custom router first; LangGraph for complex multi-agent flows
+
+Tool Calling
+
+OpenAI-compatible tools / JSON schema
+
+Supports native function calling from modern local models
+
+Model Router
+
+Custom router service
+
+Routes by capability, size, speed, or user preference
+
+5.3 Retrieval-Augmented Generation (RAG)
+
+Component
+
+Choice
+
+Notes
+
+Vector Store
+
+Chroma / LanceDB / FAISS
+
+Fully local, zero external service
+
+Document Loaders
+
+Unstructured / LlamaIndex / custom
+
+PDF, Markdown, code, web pages
+
+Chunking
+
+Recursive / semantic
+
+Configurable chunk size & overlap
+
+6. Data & Storage
+
+Component
+
+Choice
+
+Notes
+
+Primary DB
+
+SQLite (default)
+
+Zero-config, perfect for single-user / desktop
+
+Optional Scale
+
+PostgreSQL
+
+For multi-user or team deployments
+
+ORM / Query
+
+SQLAlchemy 2.0 / SQLModel
+
+Type-safe models with Pydantic integration
+
+File Storage
+
+Local filesystem
+
+Uploaded documents, generated artifacts
+
+Secrets
+
+.env + python-dotenv
+
+No secrets in source control
+
+7. Recommended Project Structure
+
+A clean monorepo-style layout that keeps frontend and backend clearly separated:
+
+localai/
+
+├── frontend/                 # Existing HTML/CSS/JS UI
+
+│   ├── index.html
+
+│   ├── css/
+
+│   └── js/
+
+├── backend/
+
+│   ├── app/
+
+│   │   ├── main.py           # FastAPI entrypoint
+
+│   │   ├── api/              # Route modules
+
+│   │   ├── agents/           # Agent definitions & router
+
+│   │   ├── models/           # Pydantic schemas
+
+│   │   └── services/         # Business logic, RAG, etc.
+
+│   ├── requirements.txt
+
+│   └── pyproject.toml
+
+├── data/                     # SQLite, vector stores, uploads
+
+├── docs/                     # Design docs, this tech stack
+
+└── README.md
+
+8. Development & Tooling
+
+Area
+
+Tool
+
+Purpose
+
+Package Manager
+
+uv / pip
+
+Fast, modern Python dependency management
+
+Code Quality
+
+Ruff + mypy
+
+Linting, formatting, type checking
+
+Testing
+
+pytest + httpx
+
+Unit & API tests
+
+API Docs
+
+FastAPI auto OpenAPI
+
+Interactive Swagger / ReDoc at /docs
+
+Containerisation
+
+Docker (optional)
+
+Reproducible environments; GPU passthrough supported
+
+9. Security & Privacy Posture
+
+All model inference stays local by default — no data leaves the machine unless explicitly configured
+
+No telemetry or analytics baked into the core stack
+
+Optional authentication (API keys / basic auth) for multi-user deployments
+
+CORS restricted to the frontend origin
+
+Secrets managed via environment variables only
+
+SQLite / vector stores remain on disk under user control
+
+10. Stack Summary
+
+LocalAI is intentionally lean:
+
+Frontend  →  Existing HTML/CSS/JS (POST /api/chat ready)
+
+Backend   →  FastAPI + Uvicorn + Pydantic
+
+Inference →  Ollama (primary) / llama.cpp
+
+Agents    →  Custom router + optional LangGraph
+
+Storage   →  SQLite + local vector store (Chroma/LanceDB/FAISS)
+
+Goal      →  Fully sovereign, private, offline-capable AI workbench
+
+— End of Tech Stack Document —

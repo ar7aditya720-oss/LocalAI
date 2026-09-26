@@ -1,0 +1,668 @@
+=== Page 1 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 1
+ LocalAI
+ Sovereign On-Premise Agentic AI Workbench
+Product Requirements Document (PRD)
+Project Type: Self-hosted / On-premise Agentic AI System
+Target Environment: Industrial organizations, PSUs, refineries, defence-linked manufacturing units and government
+offices
+Deployment: Local workstation or on-premise GPU server
+Interface: Terminal launcher + local web interface
+Primary Backend: Python + FastAPI
+Initial Local Model Runtime: Ollama
+Deployment Mode: Local / Air-gapped capable
+
+
+=== Page 2 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 2
+1. Executive Summary
+LocalAI is a self-hosted, on-premise agentic AI workbench designed for organizations that handle confidential and
+sensitive information.
+Refineries, PSUs, defence-linked manufacturing units and government offices routinely perform knowledge-intensive
+tasks involving engineering calculations, inspection reports, Piping & Instrumentation Diagrams, scanned documents,
+handwritten notes, internal correspondence, vendor negotiations, financial information, unreleased designs, internal
+software code, SOPs, technical manuals, approval notes and board presentations.
+Such information cannot always be safely processed through public cloud AI assistants. LocalAI provides a local
+alternative. The complete AI workflow is designed to execute inside the organization's own infrastructure using
+open-weight models, local document processing, local knowledge retrieval and controlled local tools.
+LocalAI is not intended to be a simple chatbot. It is an agentic AI workbench capable of planning multi-step tasks,
+selecting appropriate local models, using tools, processing multimodal data, executing code in a sandbox, searching
+organizational knowledge and generating real business deliverables.
+2. Problem Statement
+Modern AI assistants can significantly improve productivity, but confidential organizations face a major limitation:
+sensitive organizational data cannot freely be uploaded to external cloud AI systems.
+Problem 1 — Manual Work: Employees must manually read long documents, summarize reports, prepare approval
+notes, create presentations, analyze spreadsheets and review code.
+Problem 2 — Unauthorized External AI Usage: Employees may attempt to copy confidential information into public AI
+tools for productivity, creating potential data leakage, confidentiality, compliance and security risks.
+LocalAI addresses this by bringing AI capability inside the organization's own infrastructure.
+3. Product Vision
+LocalAI aims to provide modern agentic AI capabilities for confidential organizational work while keeping models,
+data, tools and outputs inside the organization's infrastructure.
+The system should understand natural-language requests, plan tasks, select suitable local models, read files, search
+internal knowledge, process PDFs, perform OCR, analyze images, execute code safely, generate documents, create
+spreadsheets, create presentations, verify results and maintain an audit trail.
+4. Objectives
+Primary objectives:
+1. Run on local organizational hardware.
+2. Support local or air-gapped deployment.
+3. Keep confidential information within the organization's infrastructure.
+4. Support multiple open-weight models.
+5. Automatically select models according to task requirements.
+6. Provide agentic multi-step task execution.
+7. Provide controlled local tools.
+8. Process documents and images.
+9. Support OCR and multimodal AI workflows.
+10. Provide local organizational knowledge retrieval.
+11. Execute code in a sandbox.
+12. Generate real deliverables.
+13. Provide task and system logs.
+
+
+=== Page 3 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 3
+14. Provide observable evidence of local execution.
+15. Work on a workstation or server with a suitable GPU.
+16. Allow additional models to be added without redesigning the application.
+5. Non-Objectives
+The initial version will not attempt to train foundation models from scratch, replace all existing enterprise applications,
+give unrestricted operating-system access to the AI, depend on public cloud AI APIs, automatically make high-impact
+organizational decisions, or guarantee that AI-generated engineering, financial, legal or safety decisions are correct.
+Human review remains necessary for consequential outputs.
+6. Target Users
+Engineers: inspection report analysis, engineering documents, technical calculations, P&ID;/document review and
+technical report generation.
+Government and PSU employees: approval notes, official reports, internal correspondence, document summarization
+and presentation creation.
+Managers: report summaries, board presentation preparation, document comparison and decision-support
+information.
+Developers: code generation, debugging, code analysis, automated testing and documentation.
+7. Core Product Architecture
+USER
+|
+v
+Terminal: localai start
+|
+v
+Local Web UI: localhost:8000
+|
+v
+FastAPI Backend
+|
+v
+LocalAI Agent Orchestrator
+|
++--> Model Router
+| +--> General Model
+| +--> Coding Model
+| +--> Vision Model
+|
++--> Tool Manager
+| +--> PDF / OCR / Image
+| +--> Word / Excel / PPT
+| +--> Sandbox / Calculator
+|
++--> Knowledge Base / RAG
++--> Local Documents
++--> Local Embeddings
+
+
+=== Page 4 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 4
++--> Local Vector Search
+8. Application Launch
+The system should be started through a terminal command:
+localai start
+The launcher initializes LocalAI, checks the environment, detects GPU availability, checks local model availability,
+checks required services, starts the FastAPI backend and displays the localhost URL.
+Example:
++--------------------------------------+
+| LocalAI |
+| Sovereign AI Workbench |
++--------------------------------------+
+[✓] GPU detected
+[✓] Local model runtime available
+[✓] Knowledge base available
+[✓] Agent tools loaded
+[✓] Security layer active
+LocalAI is running at:
+http://localhost:8000
+Press Ctrl+C to stop.
+9. User Interface
+The local web interface is accessible through http://localhost:8000.
+Major sections:
+ Chat / Workspace — natural-language requests, file uploads and agentic tasks.
+ Files — uploaded and generated files.
+ Knowledge Base — organizational documents and search.
+ Tasks — active, completed and failed tasks.
+ Logs — agent steps, model selection, tool calls and sandbox execution.
+ System Status — GPU, models, OCR, sandbox and network status.
+10. Backend
+Primary backend: Python + FastAPI.
+FastAPI handles user requests, file uploads, agent requests, model requests, tool execution and task management.
+Uvicorn runs the FastAPI application locally.
+11. Python Technology Stack
+Python
+■■■ FastAPI              → Backend/API
+■■■ Uvicorn              → Local web server
+■■■ Pydantic             → Data validation
+■■■ PyMuPDF              → PDF processing
+■■■ Pillow               → Image processing
+■■■ OpenCV               → Advanced image processing
+■■■ Pytesseract           → OCR
+■■■ python-docx           → Word generation
+
+
+=== Page 5 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 5
+■■■ openpyxl              → Excel processing
+■■■ python-pptx           → PowerPoint generation
+■■■ sentence-transformers → Local embeddings
+■■■ FAISS / Chroma        → Local vector search
+■■■ SQLite                → Local database
+12. Local AI Model Architecture
+LocalAI must not be permanently tied to one specific AI model. It should contain a model abstraction layer.
+LocalAI
+|
+v
+Model Router
+|
+v
+Model Adapter
+|
++--> Ollama
++--> llama.cpp
++--> vLLM
+This allows new models and runtimes to be introduced later.
+13. Ollama
+Ollama is not the model itself. It is a local model runtime/management layer.
+The initial prototype may use Ollama because it simplifies local model deployment. It should be treated as a
+replaceable component rather than the foundation of the entire architecture.
+LocalAI → Model Adapter → Ollama → Local Open-Weight Model → GPU.
+14. Multiple Model Support
+LocalAI should support different models for different tasks.
+General Reasoning Model → general document tasks
+Coding Model → programming tasks
+Vision Model → images, scanned documents and drawings
+Small Model → fast/simple tasks
+15. Model Router
+The Model Router determines which model should handle a task. It considers task type, input type, required
+capabilities, available models, hardware limitations and context requirements.
+Example: 'Debug this Java program.' → Coding Model.
+Example: 'Analyze this engineering drawing.' → Vision Model.
+16. Agent Architecture
+The LocalAI Agent is responsible for multi-step tasks.
+Planner → Executor → Verifier
+Overall loop:
+Understand → Plan → Execute → Observe → Verify → Continue/Correct → Complete
+
+
+=== Page 6 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 6
+17. Task Planning
+The agent breaks complex tasks into smaller actions.
+Example: 'Read this inspection report and prepare an approval note.'
+1. Read PDF
+2. Determine whether it is scanned
+3. Perform OCR if required
+4. Extract important findings
+5. Search relevant SOPs
+6. Analyze findings
+7. Draft approval note
+8. Generate Word document
+9. Validate output
+18. Tool System
+The agent should interact with tools through a controlled Tool Manager.
+Tools include:
+ File Tool
+ PDF Tool
+ OCR Tool
+ Image Tool
+ Document Tool
+ Spreadsheet Tool
+ Presentation Tool
+ Knowledge Search Tool
+ Code Sandbox
+ Calculation Tool
+The model should not receive unrestricted operating-system access.
+19. PDF Processing
+Library: PyMuPDF.
+Responsibilities:
+ Open PDF
+ Extract text
+ Extract images
+ Render PDF pages
+ Convert scanned pages to images
+ Read document metadata
+Workflow:
+PDF → PyMuPDF → Text available?
+YES → Extract text
+NO → Render page → OCR
+20. Image Processing
+Pillow handles image loading, resizing, cropping, rotation, format conversion and basic preprocessing.
+OpenCV can handle noise removal, thresholding, contrast enhancement, image cleanup, line detection and
+document preprocessing.
+
+
+=== Page 7 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 7
+Workflow:
+Image → Pillow/OpenCV → Preprocessed Image → Vision Model
+21. OCR
+Initial OCR library: Pytesseract.
+Workflow:
+Scanned PDF → PyMuPDF → Page Image → Pillow/OpenCV → Pytesseract → Extracted Text → LocalAI Agent
+Future versions can integrate a local OCR/vision model.
+22. Multimodal Processing
+LocalAI should support photographs, scanned documents, handwritten notes and engineering drawings.
+Image-processing libraries prepare the data. A local vision model performs semantic understanding.
+Image → Image Processing → Local Vision Model → Semantic Understanding → Agent
+23. Document Generation
+Word: python-docx — approval notes, reports, letters and summaries.
+Excel: openpyxl — reading/writing spreadsheets, calculations and reports.
+PowerPoint: python-pptx — board presentations, technical presentations and summary slides.
+24. Knowledge Base
+LocalAI should use organizational knowledge such as SOPs, manuals, previous reports and internal correspondence.
+Pipeline:
+Documents → Text Extraction → Chunking → Local Embeddings → Local Vector Database → Semantic Search → Relevant Context → Local Model
+25. Embedding System
+The initial system can use sentence-transformers. Embeddings must be generated locally. No external embedding
+API should be required.
+26. Vector Database
+Possible technologies:
+ FAISS
+ Chroma
+The vector database stores document embeddings and associated metadata locally.
+27. RAG Workflow
+User asks a question → LocalAI → Knowledge Search → Local SOP/Manual → Relevant Sections → Local Model →
+Grounded Answer.
+28. Coding Agent
+Example: 'Find and fix the bug in this Java program.'
+Code → Coding Model → Generated Fix → Sandbox → Compile → Run → Test → Error? → Agent fixes code →
+Repeat if needed → Verified result.
+
+
+=== Page 8 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 8
+29. Code Sandbox
+Generated code must never be executed directly on the host system.
+The sandbox should provide restricted filesystem access, resource limits, execution timeout, controlled network
+access, temporary workspace and controlled input/output.
+Docker can be used for the prototype.
+30. Example End-to-End Workflow — Inspection Report
+Input: inspection_report.pdf
+1. User uploads the file.
+2. LocalAI identifies the task as document analysis + OCR + knowledge search + document generation.
+3. Model Router selects an appropriate local model.
+4. PyMuPDF processes the PDF.
+5. If scanned, pages are converted to images and OCR is performed.
+6. LocalAI extracts inspection date, equipment, findings, defects, recommendations and observations.
+7. Knowledge Base retrieves relevant SOPs and manuals.
+8. Local model generates the approval note.
+9. python-docx creates Approval_Note.docx.
+10. LocalAI validates the generated document.
+11. User receives the final document.
+31. Coding Workflow Demonstration
+User → Coding Model → Generated Code → Sandbox → Compile → Run Tests → If failed, agent analyzes error and
+modifies code → Run again → Verified Result.
+32. Security Architecture
+Security is a core product requirement.
+Principles:
+1. Local-first processing
+2. No unnecessary external network access
+3. Least privilege
+4. Controlled tools
+5. Sandboxed execution
+6. Audit logging
+7. Human approval for sensitive actions
+33. Air-Gapped Deployment
+LocalAI should be capable of running without Internet access after required models and software have been installed.
+Organization:
+LocalAI Server → Local UI → FastAPI → Agent → Local Models → Local Tools → Organization Data
+Internet: not required for core operation.
+34. Network Proof
+The system should provide observable evidence that external AI services are not being contacted.
+
+
+=== Page 9 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 9
+Possible demonstration:
+ Network monitoring
+ Firewall rules
+ Connection logs
+ Application logs
+The UI may display External AI Calls = 0, External API Calls = 0 and Cloud Model Calls = 0 only when backed by
+actual monitoring/system evidence.
+35. Audit Logging
+LocalAI should maintain a local audit trail.
+Example:
+09:42:10 Task started
+09:42:11 inspection_report.pdf loaded
+09:42:12 PDF analysis started
+09:42:16 OCR completed
+09:42:17 Knowledge search started
+09:42:18 Local model selected
+09:42:25 Approval note generated
+09:42:26 DOCX validated
+09:42:27 Task completed
+36. Database
+Initial database: SQLite.
+Stores:
+ Task history
+ Configuration
+ Model registry
+ Audit records
+ Tool execution records
+ File metadata
+No separate database server is required for the MVP.
+37. Hardware Adaptation
+LocalAI should support different hardware configurations.
+High-end GPU → larger models
+Mid-range GPU → smaller or quantized models
+Limited hardware → lightweight models
+The application architecture remains unchanged.
+38. File Support
+Initial formats:
+Documents: PDF, DOCX, TXT
+Images: PNG, JPG, JPEG
+Spreadsheets: XLSX
+Presentations: PPTX
+Code: Java, Python, JavaScript, C/C++ depending on sandbox configuration.
+
+
+=== Page 10 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 10
+39. Recommended Project Structure
+LocalAI/
+■■■ app/
+■ ■■■ main.py
+■ ■■■ api/
+■ ■ ■■■ chat.py
+■ ■ ■■■ files.py
+■ ■ ■■■ tasks.py
+■ ■■■ agent/
+■ ■ ■■■ planner.py
+■ ■ ■■■ executor.py
+■ ■ ■■■ verifier.py
+■ ■■■ models/
+■ ■ ■■■ router.py
+■ ■ ■■■ adapters.py
+■ ■ ■■■ ollama.py
+■ ■■■ tools/
+■ ■ ■■■ pdf.py
+■ ■ ■■■ ocr.py
+■ ■ ■■■ image.py
+■ ■ ■■■ documents.py
+■ ■ ■■■ spreadsheet.py
+■ ■ ■■■ presentation.py
+■ ■ ■■■ sandbox.py
+■ ■■■ knowledge/
+■ ■ ■■■ ingest.py
+■ ■ ■■■ embeddings.py
+■ ■ ■■■ search.py
+■ ■■■ security/
+■ ■ ■■■ audit.py
+■ ■■■ database/
+■ ■■■ database.py
+■■■ frontend/
+■■■ models/
+■■■ knowledge_base/
+■■■ workspace/
+■■■ logs/
+■■■ tests/
+■■■ localai.py
+■■■ requirements.txt
+■■■ README.md
+40. Frontend Architecture
+Initial frontend: HTML + CSS + JavaScript. A future version may use React.
+Browser → localhost:8000 → FastAPI
+41. Suggested UI Layout
++------------------------------------------------------+
+| LocalAI                         ● LOCAL / SECURE     |
++---------------+--------------------------------------+
+
+
+=== Page 11 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 11
+| Workspace     |          Conversation               |
+|               |                                      |
+| New Task      | User: Analyze report.pdf            |
+| Files         |                                      |
+| Knowledge     | LocalAI: Planning task...           |
+| Tasks         |                                      |
+| Logs          | ✓ PDF processed                     |
+| Settings      | ✓ OCR completed                     |
+|               | ✓ Knowledge searched                |
+|               | ✓ Approval note generated           |
+|               |                                      |
+|               +--------------------------------------+
+|               | [Upload] [Message...]          [→]  |
++---------------+--------------------------------------+
+42. Model Registry
+LocalAI should maintain a local model registry.
+Example:
+General Model — Reasoning — Ready
+Coding Model — Coding — Ready
+Vision Model — Vision — Ready
+Small Model — Fast Tasks — Ready
+Metadata may include name, runtime, capabilities, context length, quantization, GPU requirements, priority and
+status.
+43. Model Routing Examples
+Coding request: 'Fix this Java code.' → Coding Model.
+Document request: 'Summarize this inspection report.' → General Reasoning Model.
+Image request: 'Analyze this engineering drawing.' → Vision Model.
+44. Reliability Requirements
+LocalAI should detect unavailable models, failed tools and malformed documents; handle OCR and sandbox failures;
+record errors; support task retries; and avoid falsely reporting task completion.
+45. Error Recovery
+Model unavailable → Model Router → Check alternative model → If available, continue; otherwise inform user.
+OCR failure → Image preprocessing → Retry OCR → If still failed, report failure; otherwise continue.
+46. Privacy Requirements
+LocalAI must keep prompts, uploaded documents, images, knowledge base, embeddings, model inference,
+generated outputs, task history and logs within the organization's infrastructure.
+Core functionality must not depend on public cloud AI APIs.
+47. Functional Requirements Summary
+ID
+Requirement
+FR-01
+Local deployment
+FR-02
+Terminal launcher
+
+
+=== Page 12 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 12
+ID
+Requirement
+FR-03
+Localhost web interface
+FR-04
+Multiple model support
+FR-05
+Model routing
+FR-06
+Agentic planning
+FR-07
+Local tool execution
+FR-08
+PDF processing
+FR-09
+OCR
+FR-10
+Image processing
+FR-11
+Multimodal understanding
+FR-12
+Local knowledge base
+FR-13
+RAG
+FR-14
+Word generation
+FR-15
+Excel generation
+FR-16
+PowerPoint generation
+FR-17
+Code generation
+FR-18
+Code sandbox
+FR-19
+Output verification
+FR-20
+Audit logging
+FR-21
+Network monitoring
+FR-22
+Air-gapped capability
+48. Development Phases
+Phase 1 — LocalAI Foundation: Python environment, FastAPI, Uvicorn, terminal launcher, localhost UI and basic
+local model communication.
+Phase 2 — Document Processing: file upload, PDF processing, OCR and image processing.
+Phase 3 — Document Generation: Word, Excel and PowerPoint.
+Phase 4 — Agent: planning, tool selection, execution, verification and retry.
+Phase 5 — Knowledge Base: ingestion, embeddings, vector search and RAG.
+Phase 6 — Coding Agent: code generation, sandbox, compilation, execution and testing.
+Phase 7 — Multimodal: vision model, image understanding, scanned documents and engineering drawings.
+Phase 8 — Security Demonstration: audit logs, network monitoring, external connection detection, sandbox
+restrictions and air-gapped deployment demonstration.
+49. SIH Demonstration Plan
+Demonstration 1 — Document Agent: Scanned Inspection Report → OCR → Local AI Analysis → Knowledge Search
+→ Approval Note → Word File.
+
+
+=== Page 13 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 13
+Demonstration 2 — Coding Agent: Coding Request → Coding Model → Generated Code → Sandbox →
+Compile/Test → Verified Result.
+Demonstration 3 — Multimodal Agent: Engineering Drawing → Local Vision Model → Image Understanding → AI
+Analysis.
+Demonstration 4 — Sovereignty: LocalAI Running → Network Monitor → External AI Calls = 0 → External API Calls =
+0.
+50. Success Criteria
+Deployment: localai start launches the application; localhost UI becomes available; core AI functionality works locally.
+Model System: at least two model configurations/capabilities are available and different task types can be routed
+appropriately.
+Agent: LocalAI performs a multi-step task and uses local tools.
+Documents: PDF processing, scanned-PDF OCR and DOCX generation work.
+Coding: code can be generated, executed in a sandbox and verified.
+Multimodal: at least one image/scanned-document task is processed by a local vision-capable model.
+Knowledge: LocalAI retrieves information from a local knowledge base.
+Security: core inference happens locally, no external AI API is required and network activity can be monitored and
+demonstrated.
+51. Final System Architecture
+USER
+|
+v
+Terminal Launcher: localai start
+|
+v
+Local Web UI: localhost:8000
+|
+v
+FastAPI Backend
+|
+v
+LocalAI Agent
+|
++--> Planner → Executor → Verifier
+|
++--> Model Router
+| +--> General Model
+| +--> Coding Model
+
+
+=== Page 14 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 14
+| +--> Vision Model
+|
++--> Tool Manager
+| +--> PDF / OCR / Image
+| +--> Word / Excel / PPT
+| +--> Sandbox / Calculator
+|
++--> Knowledge Base / RAG
++--> Local Documents
++--> Local Embeddings
++--> Local Vector Search
+|
+v
+Local GPU / Hardware
+|
+v
+Organization Data
+Internet: NOT REQUIRED for core operation.
+52. Final Technology Stack
+Application — LocalAI
+Programming Language — Python
+Backend — FastAPI
+Server — Uvicorn
+Validation — Pydantic
+Local Model Runtime — Ollama initially
+Model Abstraction — Custom adapter layer
+PDF Processing — PyMuPDF
+Image Processing — Pillow
+Advanced Image Processing — OpenCV
+OCR — Pytesseract initially
+Word Generation — python-docx
+Excel — openpyxl
+PowerPoint — python-pptx
+Embeddings — sentence-transformers
+Vector Database — FAISS / Chroma
+Database — SQLite
+Sandbox — Docker
+Frontend — HTML/CSS/JavaScript or React
+Deployment — Local workstation / GPU server
+Network — Local / Air-gapped capable
+53. Core Design Principle
+The application must depend on capabilities, not on a particular model or model runtime.
+LocalAI → Capability Layer → Local Models + Local Tools → Organization Data.
+If a better open-weight model becomes available in the future, it can be added to LocalAI without redesigning the
+
+
+=== Page 15 ===
+LocalAI — Sovereign On-Premise Agentic AI Workbench
+Page 15
+entire system.
+54. MVP Definition
+The minimum viable LocalAI prototype should contain:
+✓ Terminal launcher
+✓ localhost web UI
+✓ FastAPI backend
+✓ Local model runtime
+✓ Multiple model/capability support
+✓ Model router
+✓ PDF processing
+✓ OCR
+✓ Image processing
+✓ Local knowledge search
+✓ Agent planning
+✓ Tool execution
+✓ Word generation
+✓ Code sandbox
+✓ Multimodal demonstration
+✓ Audit logs
+✓ Network monitoring
+✓ Local/air-gapped deployment capability
+55. Product Statement
+LocalAI is a sovereign, self-hosted agentic AI workbench that enables organizations to perform confidential
+knowledge work using local open-weight AI models, local tools and organizational knowledge—without requiring
+confidential data to leave the organization's infrastructure.
+The prototype demonstrates that local AI can move beyond simple chat and perform complete workflows involving
+planning, model selection, document understanding, knowledge retrieval, tool execution, code verification, multimodal
+processing and real-world deliverable generation.
+
+

@@ -1,0 +1,583 @@
+LocalAI
+
+Sovereign On-Premise Agentic AI Workbench
+
+DESIGN DOCUMENTUI + System Architecture + Backend Integration DesignVersion 1.0 | September 2026
+
+1. Document Purpose
+
+This document defines the design of LocalAI, a self-hosted, on-premise agentic AI workbench for confidential organizational knowledge work. It combines the supplied web interface with a planned Python/FastAPI backend, local model runtime, agent orchestration, document processing, multimodal processing, local knowledge retrieval, sandboxed code execution, and deliverable generation.
+
+The supplied UI is a single-page dark, animated workbench with a boot sequence, sidebar navigation, top status bar, chat workspace, command palette and animated local-AI visual core. fileciteturn2file0
+
+2. Design Goals
+
+Keep sensitive data and AI inference inside the organization's infrastructure.
+
+Provide a modern local AI workspace while remaining self-hosted.
+
+Start from a terminal command and expose the application through localhost.
+
+Separate UI, API, agent, model runtime and tool layers.
+
+Support multiple local models and task-based model routing.
+
+Support multi-step agentic workflows.
+
+Generate DOCX, XLSX, PPTX and verified code.
+
+Make local execution, auditability and network state observable.
+
+3. Existing UI Analysis
+
+UI Element
+
+Current Design / Role
+
+Boot screen
+
+Animated initialization screen with local runtime, agent, knowledge, multimodal and storage status messages.
+
+Sidebar
+
+New Session, Chat, Agents, Knowledge, Files, Models, System Status and Settings.
+
+Top bar
+
+Agent status, model information and local/offline badge.
+
+Chat workspace
+
+Scrollable conversation area with user and assistant message styling.
+
+Input area
+
+Textarea, Attach, @Agent, /Command, Ctrl+K and Send.
+
+Command palette
+
+New Session, Switch Agent, Select Model, Search Local Knowledge and Restart Runtime.
+
+Animated core
+
+Floating ambient AI indicator.
+
+Responsive behavior
+
+Smaller spacing on narrow screens and reduced-motion support.
+
+The current JavaScript adds the user's message, shows a thinking state and then calls a mock backend function. It also contains a commented example fetch request to a localhost FastAPI endpoint, so the interface is already structured for backend integration. fileciteturn3file1
+
+4. UI Design Specification
+
+4.1 Application Shell
+
+The application uses a full-screen dark interface. A fixed sidebar provides navigation while the main workspace contains the top status bar, conversation area and input composer. The supplied stylesheet defines a 260px sidebar, 60px top bar and responsive chat/input region. fileciteturn2file0
+
+4.2 Navigation
+
+Section
+
+Items
+
+Purpose
+
+Workspace
+
+New Session, Chat, Agents, Knowledge, Files
+
+User tasks and organizational data
+
+System
+
+Models, System Status, Settings
+
+Runtime, hardware and configuration
+
+4.3 Chat Interface
+
+The chat area is the primary interaction surface. Users submit natural-language requests, optionally attach files, invoke an agent and receive task results.
+
+4.4 Command Palette
+
+Ctrl+K opens a command palette intended for fast actions such as switching agents, selecting models, searching local knowledge, creating sessions and restarting the local runtime. fileciteturn3file1
+
+5. Runtime and Launch Design
+
+LocalAI is designed to start from the terminal:
+
+localai start
+
+Terminal  ↓localai start  ↓Environment / GPU / runtime checks  ↓FastAPI + Uvicorn  ↓http://localhost:8000  ↓LocalAI Web UI
+
+6. High-Level System Architecture
+
+USER  ↓Terminal Launcher: localai start  ↓LocalAI Web UI: localhost:8000  ↓ HTTP / JSONFastAPI Backend  ↓Agent Engine  ├── Model Router  ├── Tool Manager  └── Local Knowledge / RAG        ↓Local Models + Local Tools + Organization Data        ↓GPU / CPU
+
+7. Layered Architecture
+
+Layer
+
+Responsibility
+
+Technology / Example
+
+Presentation
+
+Browser workspace
+
+HTML, CSS, JavaScript
+
+API
+
+Requests, uploads, tasks
+
+FastAPI + Uvicorn
+
+Agent
+
+Planning, execution, verification
+
+Python
+
+Model routing
+
+Task/capability selection
+
+LocalAI model router
+
+Model runtime
+
+Local model inference
+
+Ollama initially
+
+Tools
+
+PDF, OCR, images, documents, code
+
+Python libraries + Docker
+
+Knowledge
+
+Embeddings and retrieval
+
+sentence-transformers + FAISS/Chroma
+
+Storage
+
+Metadata and audit
+
+SQLite + local filesystem
+
+Security
+
+Sandbox, permissions, audit
+
+Docker + OS/firewall controls
+
+8. UI-to-Backend Integration
+
+The current interface should be retained and connected to FastAPI rather than redesigned. The main change is replacing the mock response function with real localhost HTTP requests.
+
+Browser UI  ├── POST /api/chat  ├── POST /api/upload  ├── GET  /api/tasks/{id}  ├── GET  /api/models  ├── GET  /api/system/status  └── GET  /api/logs           ↓        FastAPI           ↓       Agent Engine
+
+The supplied HTML already documents the intended POST /api/chat request pattern and a fallback error message when the local runtime is unreachable. fileciteturn3file1
+
+9. Proposed API Contract
+
+Method
+
+Endpoint
+
+Purpose
+
+POST
+
+/api/chat
+
+Submit chat/task request
+
+POST
+
+/api/upload
+
+Upload a file
+
+POST
+
+/api/tasks
+
+Create an agentic task
+
+GET
+
+/api/tasks/{task_id}
+
+Get task status/result
+
+GET
+
+/api/models
+
+List local models
+
+POST
+
+/api/models/select
+
+Select model
+
+GET
+
+/api/knowledge/search
+
+Search local knowledge
+
+GET
+
+/api/system/status
+
+Runtime/GPU/model status
+
+GET
+
+/api/logs
+
+Audit/task events
+
+10. Agent Architecture
+
+User Request  ↓Task Understanding  ↓Planner  ↓Model / Tool Selection  ↓Executor  ↓Observe Result  ↓Verifier  ↙     ↘Retry   Complete          ↓      Deliverable
+
+The agent must be tool-aware and must not receive unrestricted operating-system access. Each tool exposes a controlled interface and returns structured results.
+
+11. Model Router
+
+Task ↓Model Router ├── General reasoning model → documents / analysis ├── Coding model → code / debugging / tests └── Vision model → images / scanned documents / drawings
+
+Ollama is the initial local model runtime, not the product identity. A model-adapter layer should allow another local runtime to be added later.
+
+12. Document and Multimodal Pipeline
+
+PDF ↓PyMuPDF ↓Text available? ├─ Yes → Extract text └─ No → Render page → Pillow/OpenCV → OCR                                      ↓                                  Local AI Agent
+
+Library
+
+Use
+
+PyMuPDF
+
+PDF reading, text extraction, rendering
+
+Pillow
+
+Image loading, resizing, cropping and conversion
+
+OpenCV
+
+Image cleanup and document preprocessing
+
+Pytesseract
+
+Initial local OCR integration
+
+python-docx
+
+Word document generation
+
+openpyxl
+
+Excel processing
+
+python-pptx
+
+PowerPoint generation
+
+sentence-transformers
+
+Local embeddings
+
+FAISS / Chroma
+
+Local semantic retrieval
+
+SQLite
+
+Local metadata and audit records
+
+13. Knowledge Base / RAG
+
+Organization Documents      ↓Text / OCR extraction      ↓Chunking      ↓Local Embeddings      ↓FAISS / Chroma      ↓Semantic Search      ↓Relevant Context      ↓Local Model      ↓Grounded Response
+
+14. Code Execution Sandbox
+
+Generated code should execute in an isolated sandbox rather than directly on the host. Docker is suitable for the prototype. The sandbox should enforce restricted filesystem access, timeouts, resource limits and controlled network access.
+
+Coding request → Coding model → Generated code → Sandbox → Compile/Test → Verifier → Result
+
+15. Deliverable Generation
+
+Output
+
+Library
+
+Example
+
+Word
+
+python-docx
+
+Approval note / report
+
+Excel
+
+openpyxl
+
+Analysis workbook
+
+PowerPoint
+
+python-pptx
+
+Board/technical presentation
+
+Code
+
+Sandbox + filesystem
+
+Verified internal tool
+
+Calculation
+
+Python/local tools
+
+Steps + result
+
+16. Security and Sovereignty Design
+
+The sovereignty claim must be implemented and demonstrable, not only displayed in the UI. The current interface includes an OFFLINE / LOCAL badge and local status indicators; these should be backed by actual runtime and network checks in the backend. fileciteturn3file0
+
+Local model inference
+
+Local document and image processing
+
+Local embeddings and vector search
+
+Controlled tool execution
+
+Sandboxed generated code
+
+Local audit logging
+
+No required public AI APIs
+
+Network/firewall monitoring for demonstrable external connectivity state
+
+17. Current UI vs Backend Integration
+
+Feature
+
+Current UI
+
+Integration
+
+Chat
+
+Implemented visually
+
+POST /api/chat
+
+Thinking indicator
+
+Implemented
+
+Drive from task state
+
+Attach
+
+UI control
+
+POST /api/upload
+
+@Agent
+
+UI control
+
+Agent selector
+
+/Command
+
+UI control
+
+Command registry
+
+Model display
+
+Static example
+
+Populate from /api/models
+
+Local badge
+
+Visual
+
+Back with actual checks
+
+Knowledge
+
+Navigation item
+
+Local RAG API
+
+Agents
+
+Navigation item
+
+Agent registry
+
+Files
+
+Navigation item
+
+Workspace API
+
+System Status
+
+Navigation item
+
+System-status API
+
+Command palette
+
+Implemented
+
+Backend actions
+
+18. Recommended Project Structure
+
+LocalAI/├── frontend/│   ├── index.html│   ├── styles.css│   └── app.js├── app/│   ├── main.py│   ├── api/│   ├── agent/│   ├── models/│   ├── tools/│   ├── knowledge/│   ├── security/│   └── database/├── models/├── knowledge_base/├── workspace/├── logs/├── tests/├── localai.py├── requirements.txt└── README.md
+
+19. End-to-End Demonstration Workflows
+
+19.1 Scanned Inspection Report → Approval Note
+
+Upload report  ↓PDF detection  ↓PyMuPDF + OCR if required  ↓Extract findings  ↓Search local SOP/manual knowledge base  ↓Local model analysis  ↓Draft approval note  ↓python-docx  ↓Approval_Note.docx
+
+19.2 Coding Agent
+
+Request → Coding model → Code → Sandbox → Compile → Test → Fix if needed → Verified output
+
+19.3 Multimodal Task
+
+Image / scan / drawing → Pillow/OpenCV → Local vision model → Agent reasoning → Result
+
+20. UI Integration Implementation Plan
+
+Keep the current visual design.
+
+Create the FastAPI service.
+
+Implement POST /api/chat first.
+
+Replace the mock backend function with a real fetch() call.
+
+Return structured JSON containing reply, task_id, model and status.
+
+Connect the thinking indicator to task state.
+
+Implement /api/upload and connect Attach.
+
+Implement model/agent endpoints for the command palette.
+
+Populate status information from the backend.
+
+Add streaming after the basic request/response loop is stable.
+
+21. Initial Backend Sequence
+
+1. localai start2. FastAPI starts3. Uvicorn serves localhost4. Browser loads UI5. UI sends POST /api/chat6. FastAPI validates with Pydantic7. Agent receives task8. Model router selects local model9. Runtime performs inference10. Agent returns result11. FastAPI returns JSON12. UI renders response
+
+22. Requirements Traceability
+
+Requirement
+
+Design Component
+
+Local deployment
+
+Terminal launcher + FastAPI + local runtime
+
+Multiple models
+
+Model registry + router + adapters
+
+Agentic execution
+
+Planner + executor + verifier
+
+PDF understanding
+
+PyMuPDF + OCR
+
+Image understanding
+
+Pillow/OpenCV + local vision model
+
+Organizational knowledge
+
+Local embeddings + vector DB + RAG
+
+Code execution
+
+Docker sandbox
+
+Real deliverables
+
+python-docx + openpyxl + python-pptx
+
+Security evidence
+
+Audit logs + network monitoring
+
+Mid-range GPU
+
+Local smaller/quantized model selection
+
+Future models
+
+Runtime/model abstraction layer
+
+23. Success Criteria
+
+Terminal command starts the application and exposes localhost.
+
+The supplied UI communicates with FastAPI.
+
+At least one local model answers through the UI.
+
+At least two task categories can use suitable model configurations.
+
+A scanned document can be processed locally.
+
+A real DOCX approval note can be generated.
+
+A coding task can run and be tested in a sandbox.
+
+A multimodal task can process an image or scan.
+
+Local organizational documents can be retrieved.
+
+Task/tool activity can be logged.
+
+The demonstration provides evidence of local execution and network behavior.
+
+24. Final Architecture Summary
+
+                         LOCALAI                            │             ┌──────────────┴──────────────┐             │                             │      Terminal Launcher                Web UI       localai start                  localhost             │                             │             └──────────────┬──────────────┘                            ▼                         FastAPI                            │                       Agent Engine                            │          ┌─────────────────┼─────────────────┐          ▼                 ▼                 ▼     Model Router       Tool Manager       Local RAG          │                 │                 │          ▼                 ▼                 ▼     Local Models      PDF/OCR/Image      Local KB     Coding/Vision     DOCX/XLSX/PPTX     Embeddings                       Sandbox             Vector DB                            │                            ▼                    Organization GPU/CPU
+
+Design principle: the UI is the user's workspace; FastAPI is the local gateway; the agent is the execution layer; the model router selects local AI capabilities; tools perform controlled work; and the knowledge base grounds responses in organizational information.
+
+25. Conclusion
+
+The supplied interface is suitable as the presentation layer for LocalAI and already contains the main interaction surfaces required by the system. The next implementation step is therefore not a UI rewrite. The recommended approach is to preserve the current interface and replace its mock backend behavior with a real localhost FastAPI service. The system can then be expanded incrementally into model routing, agentic planning, PDF/OCR processing, local RAG, multimodal analysis, document generation, sandboxed coding and security/audit functionality.
