@@ -97,7 +97,7 @@ http://localhost:8000
 - Python 3.x
 - [Ollama](https://ollama.com) installed locally, with the models listed above pulled (`ollama pull llama3.1:latest`, etc.)
 - PyMuPDF, Pytesseract, OpenCV, and PIL for the OCR pipeline
-- The system uses the (https://ollama.com/download/windows)Ollama model, which is closed now, so no data breach occurs, so the user should be having ollam    model in there pc so then use the AI.
+- The system uses the (https://ollama.com/download/windows)Ollama model, which is closed now, so no data breach occurs; To use it the user should be having ollam model in there pc so then use the AI part of the project.
 - 
 - Also, Python 3.1 version on there pc.
 ---
